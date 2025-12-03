@@ -4,10 +4,11 @@ import time
 import json
 import psycopg2
 import redis
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Header, Request
 from fastapi.responses import JSONResponse
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 from starlette.responses import Response
+from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
 
 # Configuration
@@ -19,6 +20,7 @@ DB_PASSWORD = os.getenv('DB_PASSWORD', 'solana123')
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = int(os.getenv('REDIS_PORT', '6379'))
 CACHE_TTL = int(os.getenv('CACHE_TTL', '60'))
+API_KEY = os.getenv('API_KEY', '')
 
 # Prometheus metrics
 api_requests = Counter('api_requests_total', 'Total API requests', ['endpoint', 'method'])
@@ -30,6 +32,28 @@ db_queries = Counter('db_queries_total', 'Total database queries', ['query_type'
 db_query_duration = Histogram('db_query_duration_seconds', 'Database query duration', ['query_type'])
 
 app = FastAPI(title="Helius API Demo", version="1.0.0")
+
+# API Key validation middleware
+class APIKeyMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Skip auth for health and metrics endpoints
+        if request.url.path in ["/health", "/metrics"]:
+            return await call_next(request)
+
+        # Check API key
+        api_key = request.headers.get("x-api-key") or request.query_params.get("api_key")
+        if not api_key or api_key != API_KEY:
+            return JSONResponse(
+                status_code=401,
+                content={"error": "Invalid or missing API key. Provide via 'x-api-key' header or 'api_key' query parameter."}
+            )
+
+        return await call_next(request)
+
+# Add middleware if API_KEY is configured
+if API_KEY:
+    app.add_middleware(APIKeyMiddleware)
+    print(f"API key authentication enabled")
 
 # Database connection pool
 def get_db():

@@ -23,7 +23,7 @@ DB_PORT = int(os.getenv('DB_PORT', '5432'))
 DB_NAME = os.getenv('DB_NAME', 'solana')
 DB_USER = os.getenv('DB_USER', 'solana')
 DB_PASSWORD = os.getenv('DB_PASSWORD', 'solana123')
-BATCH_SIZE = int(os.getenv('BATCH_SIZE', '100'))  # Solana ~4000 tx/block, scaled down 40x
+BATCH_SIZE = int(os.getenv('BATCH_SIZE', '10'))  # Solana ~4000 tx/block, scaled down 400x
 INTERVAL_MS = int(os.getenv('INTERVAL_MS', '400'))  # Solana block time ~400ms
 METRICS_PORT = int(os.getenv('METRICS_PORT', '8000'))
 

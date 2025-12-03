@@ -6,6 +6,7 @@ import psycopg2
 import redis
 from fastapi import FastAPI, HTTPException, Query, Header, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 from starlette.responses import Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -32,6 +33,19 @@ db_queries = Counter('db_queries_total', 'Total database queries', ['query_type'
 db_query_duration = Histogram('db_query_duration_seconds', 'Database query duration', ['query_type'])
 
 app = FastAPI(title="Helius API Demo", version="1.0.0")
+
+# CORS middleware - allow requests from helius-demo frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://helius-dev.arcanis.app",
+        "https://helius-prod.arcanis.app",
+        "http://localhost:8081",  # For local development
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # API Key validation middleware
 class APIKeyMiddleware(BaseHTTPMiddleware):

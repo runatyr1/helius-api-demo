@@ -50,8 +50,8 @@ app.add_middleware(
 # API Key validation middleware
 class APIKeyMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Skip auth for health and metrics endpoints
-        if request.url.path in ["/health", "/metrics"]:
+        # Skip auth for health, metrics, and OPTIONS (CORS preflight)
+        if request.url.path in ["/health", "/metrics"] or request.method == "OPTIONS":
             return await call_next(request)
 
         # Check API key

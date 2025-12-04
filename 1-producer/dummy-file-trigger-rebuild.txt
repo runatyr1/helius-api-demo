@@ -1,1 +1,2 @@
 trigger rebuild to test selective directory build
+trigger rebuild to test single commit for image automation

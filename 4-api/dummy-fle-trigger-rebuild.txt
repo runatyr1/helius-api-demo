@@ -1,2 +1,3 @@
 trigger rebuild to test single commit for image automation - now changing 2 components at once
 trigger rebuild to test image automation commit descripton change - 2 components, new template
+trigger rebuild to test on infra v2

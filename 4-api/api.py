@@ -40,6 +40,8 @@ app.add_middleware(
     allow_origins=[
         "https://helius-dev.arcanis.app",
         "https://helius-prod.arcanis.app",
+        "https://demo1.pietro.app",
+        "https://demo1-dev.pietro.app",
         "http://localhost:8081",  # For local development
     ],
     allow_credentials=True,
